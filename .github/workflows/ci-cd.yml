@@ -35,7 +35,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/lizIrina/prubaD:1.0.0
+        tags: ghcr.io/lizirina/prubad:1.0.0
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v0.1.10
       with:
@@ -43,7 +43,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          docker pull ghcr.io/lizIrina/prubaD:1.0.0
-          docker stop prubaD-app || true
-          docker rm prubaD-app || true
-          docker run -d --name prubaD-app -p 80:5000 -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ghcr.io/lizIrina/prubaD:1.0.0
+          docker pull ghcr.io/lizirina/prubad:1.0.0
+          docker stop prubad-app || true
+          docker rm prubad-app || true
+          docker run -d --name prubad-app -p 80:5000 -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ghcr.io/lizirina/prubad:1.0.0
