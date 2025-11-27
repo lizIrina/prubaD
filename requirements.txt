@@ -1,2 +1,4 @@
 Flask==2.3.3
 openai==0.28.1
+pytest==7.4.0
+flask-testing==0.8.1
