@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - moreno
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Run tests
+      run: pytest tests/
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/${{ github.repository }}/moreno:1.0.5
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          docker pull ghcr.io/${{ github.repository }}/moreno:1.0.5
+          docker stop moreno-app || true
+          docker rm moreno-app || true
+          docker run -d --name moreno-app -p 80:5000 -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ghcr.io/${{ github.repository }}/moreno:1.0.5
