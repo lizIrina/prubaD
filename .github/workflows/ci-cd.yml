@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - moreno
+      - morocho
 
 jobs:
   test:
@@ -35,7 +35,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}/moreno:1.0.5
+        tags: ghcr.io/lizIrina/morocho:1.0.5
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v0.1.10
       with:
@@ -43,7 +43,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          docker pull ghcr.io/${{ github.repository }}/moreno:1.0.5
+          docker pull ghcr.io/lizIrina/morocho:1.0.5
           docker stop moreno-app || true
           docker rm moreno-app || true
-          docker run -d --name moreno-app -p 80:5000 -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ghcr.io/${{ github.repository }}/moreno:1.0.5
+          docker run -d --name morocho-app -p 80:5000 -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ghcr.io/lizIrina/morocho:1.0.5
